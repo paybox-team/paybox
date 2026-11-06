@@ -2,7 +2,7 @@
   <img src="./apps/web/public/assets/paybox-logo.svg" alt="PayBox" width="120" />
 
   <h1>PayBox</h1>
-  <p>Pay-per-query internet access for AI agents · Stellar · x402</p>
+  <p>internet actions · Stellar · x402</p>
 
   <p>
     <img src="https://img.shields.io/github/actions/workflow/status/paybox-team/paybox/ci.yml?branch=main&label=CI&style=flat-square" />
@@ -30,8 +30,6 @@
 ```
 
 > PayBox turns internet actions into priced, payable intents.
-> Search, news, and scraping become on-demand transactions with
-> transparent settlement and full audit trails — no subscriptions.
 
 ---
 
