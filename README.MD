@@ -5,7 +5,6 @@
   <p>internet actions · Stellar · x402</p>
 
   <p>
-    <img src="https://img.shields.io/github/actions/workflow/status/paybox-team/paybox/ci.yml?branch=main&label=CI&style=flat-square" />
     <img src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
     <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square" />
     <img src="https://img.shields.io/badge/network-Stellar%20testnet-blueviolet?style=flat-square" />
