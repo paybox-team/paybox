@@ -1,96 +1,137 @@
 <div align="center">
-  <img src="./apps/web/public/assets/paybox-logo.svg" alt="PayBox logo" width="160" />
+  <img src="./apps/web/public/assets/paybox-logo.svg" alt="PayBox" width="120" />
+
   <h1>PayBox</h1>
-  <p><strong>Pay-per-query internet access for AI agents on Stellar via x402.</strong></p>
+  <p>Pay-per-query internet access for AI agents · Stellar · x402</p>
+
   <p>
-    <a href="https://github.com/paybox-team/paybox/actions"><img src="https://img.shields.io/github/actions/workflow/status/paybox-team/paybox/ci.yml?branch=main&label=CI" alt="CI" /></a>
-    <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License" />
-    <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node" />
-    <img src="https://img.shields.io/badge/network-Stellar%20testnet-blueviolet" alt="Stellar" />
+    <img src="https://img.shields.io/github/actions/workflow/status/paybox-team/paybox/ci.yml?branch=main&label=CI&style=flat-square" />
+    <img src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" />
+    <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square" />
+    <img src="https://img.shields.io/badge/network-Stellar%20testnet-blueviolet?style=flat-square" />
   </p>
 </div>
 
+<br />
+
+```
+  Agent picks provider
+        │
+        ▼
+  POST /x402/search ──► HTTP 402 + payment details
+        │                        │
+        │               Agent settles on Stellar
+        │                        │
+        ◄────────────────────────┘
+  Result + payment proof returned
+        │
+        ▼
+  Usage logged · Spend tracked · Analytics updated
+```
+
+> PayBox turns internet actions into priced, payable intents.
+> Search, news, and scraping become on-demand transactions with
+> transparent settlement and full audit trails — no subscriptions.
+
 ---
 
-PayBox is a pay-per-query API gateway for AI agents. Powered by Stellar and the x402 payment protocol, it routes agent requests through a provider marketplace where every search, news lookup, and web scrape is individually priced and settled on-chain. No subscriptions. Just transparent, auditable micropayments per request.
-
-## How it works
+## 📦 Monorepo
 
 ```
-Agent → PayBox API → x402 challenge → Agent pays → Route unlocks → Result returned
-                          ↓
-                   Stellar testnet settlement
-                          ↓
-                   Usage + spend logged to SQLite
+paybox/
+│
+├── apps/
+│   ├── api/                    # Express API + x402 middleware
+│   │   └── src/
+│   │       ├── lib/
+│   │       │   ├── x402.ts         ← payment middleware
+│   │       │   ├── pricing.ts      ← provider catalog + SLA badges
+│   │       │   ├── persistence.ts  ← storage layer
+│   │       │   └── sponsorship/    ← challenge/grant flow
+│   │       ├── routes/
+│   │       │   ├── public.ts       ← /health, /api/providers, /api/analytics
+│   │       │   ├── protected.ts    ← /x402/search, /x402/news, /x402/scrape
+│   │       │   ├── demo.ts         ← /api/paid/run (sponsored)
+│   │       │   └── sponsorship.ts  ← /api/sponsorship/*
+│   │       └── services/
+│   │           └── query-service.ts ← provider execution + fallback
+│   │
+│   ├── agent-client/           # Node CLI agent
+│   │   └── src/
+│   │       ├── cli.ts              ← search / news / scrape commands
+│   │       ├── client.ts           ← x402 fetch + payment flow
+│   │       ├── transcript.ts       ← demo transcript generator
+│   │       └── validate-real.ts    ← real payment proof runner
+│   │
+│   └── web/                    # React dashboard
+│       └── src/
+│           ├── pages/
+│           │   ├── LandingPage.tsx ← hero + live stats
+│           │   └── ControlDeckPage.tsx ← provider cards + query workspace
+│           └── lib/
+│               ├── receipt.ts      ← export payment receipts
+│               └── x402.ts         ← browser x402 client
+│
+└── packages/
+    └── shared/                 # Shared Zod schemas + TypeScript types
+        └── src/
+            ├── schemas.ts          ← receipt, provider, grant schemas
+            └── types.ts            ← QueryResult, UsageEvent, PaymentAttempt
 ```
 
-1. Agent picks a provider and sends a query
-2. API responds with HTTP 402 + payment details
-3. Agent settles via x402 on Stellar testnet
-4. Route executes, result is returned with payment proof
-5. Every query is logged with trace ID, price, and latency
+---
 
-## Features
-
-- **Provider marketplace** — search, news, scrape with price/latency/quality comparison
-- **x402 payment middleware** — HTTP 402 challenge/response on every paid route
-- **Stellar testnet settlement** — real on-chain micropayments via `@x402/stellar`
-- **Sponsorship flow** — challenge/grant system for sponsored agent sessions
-- **Spend analytics** — per-category usage, payment history, settlement digest
-- **Demo mode** — deterministic fallback for zero-credential demos
-- **Agent CLI** — `search`, `news`, `scrape` commands with structured receipt output
-- **React dashboard** — provider cards, paid query workspace, analytics panel
-
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| API | Express 5, TypeScript, x402 |
-| Payments | Stellar testnet, x402, OpenZeppelin facilitator |
-| Storage | SQLite (better-sqlite3), memory adapter for tests |
-| Frontend | React 18, Vite, Tailwind CSS |
-| Agent client | Node CLI, tsx |
-| Monorepo | npm workspaces |
-
-## Quickstart
+## 🚀 Quickstart
 
 ```bash
-# 1. Clone and install
 git clone https://github.com/paybox-team/paybox.git
 cd paybox
 npm install
+cp .env.example .env      # DEMO_MODE=true by default
 
-# 2. Copy env and enable demo mode
-cp .env.example .env
+# Terminal 1
+npm run dev:api            # → http://localhost:3001
 
-# 3. Start API (terminal 1)
-npm run dev:api
-
-# 4. Start web dashboard (terminal 2)
-npm run dev:web
-# → http://localhost:5173
+# Terminal 2
+npm run dev:web            # → http://localhost:5173
 ```
 
-No credentials needed for demo mode. The API runs deterministically with `DEMO_MODE=true`.
+No credentials needed in demo mode.
 
-## API routes
+---
 
-| Method | Route | Auth | Description |
-|--------|-------|------|-------------|
-| GET | `/health` | — | Service health + config snapshot |
-| GET | `/api/providers` | — | Provider catalog |
-| GET | `/api/catalog` | — | Full catalog with pricing |
-| GET | `/api/usage` | — | Paginated usage events |
-| GET | `/api/analytics` | — | Spend summary + breakdown |
-| GET | `/api/audit/digest` | — | Settlement digest |
-| GET | `/x402/search` | x402 | Paid search query |
-| GET | `/x402/news` | x402 | Paid news query |
-| GET | `/x402/scrape` | x402 | Paid page scrape |
-| POST | `/api/paid/run` | grant | Sponsored paid run |
-| POST | `/api/sponsorship/challenge` | — | Issue challenge |
-| POST | `/api/sponsorship/grants` | — | Exchange grant |
+## 🌐 API Routes
 
-## Agent CLI
+```
+paybox-api (port 3001)
+│
+├── PUBLIC
+│   ├── GET  /health                    health + config snapshot
+│   ├── GET  /api/providers             provider catalog
+│   ├── GET  /api/catalog               catalog with pricing
+│   ├── GET  /api/matrix                provider capability matrix
+│   ├── GET  /api/usage                 paginated usage events
+│   ├── GET  /api/analytics             spend summary + breakdown
+│   ├── GET  /api/audit/digest          settlement digest
+│   └── GET  /api/scenarios             demo scenario manifest
+│
+├── PAID  (x402 protected)
+│   ├── GET  /x402/search               paid search query
+│   ├── GET  /x402/news                 paid news query
+│   └── GET  /x402/scrape               paid page scrape
+│
+├── SPONSORED
+│   └── POST /api/paid/run              sponsored run with signed grant
+│
+└── SPONSORSHIP
+    ├── POST /api/sponsorship/challenge  issue wallet challenge
+    ├── POST /api/sponsorship/grants     exchange for signed grant
+    └── POST /api/sponsorship/preview    preview sponsorship eligibility
+```
+
+---
+
+## 🤖 Agent CLI
 
 ```bash
 # Search
@@ -102,35 +143,47 @@ npm run cli -- news "stablecoin micropayments" --provider news.fast
 # Scrape
 npm run cli -- scrape "https://developers.stellar.org" --provider scrape.page
 
-# Machine-readable receipt
+# Structured receipt output
 npm run cli -- search "stellar x402" --provider search.pro --receipt
 
-# Full demo showcase
+# Full demo flow
 npm run demo:agent
-```
 
-## Real payment validation
-
-```bash
-# 1. Set DEMO_MODE=false in .env and fill real funded keys
-# 2. Start the API
-npm run dev:api
-
-# 3. Run the validator
+# Real payment proof (requires funded testnet keys)
 npm run validate:real
 ```
 
-Output includes `payment-response` header, trace ID, provider, and price — full on-chain proof.
+---
 
-## Environment variables
+## 🏪 Provider Catalog
+
+```
+category   id                price     latency   quality
+─────────────────────────────────────────────────────────
+search     search.live       $0.05     1500ms    99
+search     search.basic      $0.01      700ms    75
+search     search.pro        $0.02     1100ms    90
+news       news.fast         $0.015     800ms    72
+news       news.deep         $0.03     1400ms    93
+scrape     scrape.page       $0.02     1000ms    70
+scrape     scrape.extract    $0.04     1700ms    95
+```
+
+All providers fall back to deterministic output when live keys are unavailable.
+
+---
+
+## ⚙️ Environment Variables
 
 ```bash
-# Required for real payments
+# Stellar + x402
 STELLAR_NETWORK=stellar:testnet
 STELLAR_RPC_URL=https://soroban-testnet.stellar.org
 X402_FACILITATOR_URL=https://channels.openzeppelin.com/x402/testnet
 X402_FACILITATOR_API_KEY=
 X402_PAY_TO_ADDRESS=G...
+
+# Agent wallets
 DEMO_CLIENT_SECRET_KEY=S...
 DEMO_CLIENT_PUBLIC_KEY=G...
 
@@ -138,51 +191,57 @@ DEMO_CLIENT_PUBLIC_KEY=G...
 PORT_API=3001
 API_BASE_URL=http://localhost:3001
 VITE_API_BASE_URL=http://localhost:3001
-
-# Demo mode (no credentials needed)
-DEMO_MODE=true
+DEMO_MODE=true              # set false for real payments
 
 # Optional AI providers
 GROQ_API_KEY=
 BRAVE_API_KEY=
 NEWS_API_KEY=
 
-# Sponsorship (disabled by default)
+# Sponsorship (off by default)
 SPONSORSHIP_ENABLED=false
 SPONSORSHIP_SIGNING_SECRET=
 ```
 
-## Monorepo structure
+---
 
-```
-paybox/
-├── apps/
-│   ├── api/              # Express API + x402 middleware
-│   ├── agent-client/     # Node CLI agent
-│   └── web/              # React dashboard
-├── packages/
-│   └── shared/           # Zod schemas + shared types
-├── scripts/              # Dev utilities
-└── .env.example
-```
-
-## Development
+## 🧪 Testing
 
 ```bash
-npm run build         # Build all workspaces
-npm run typecheck     # TypeScript check across monorepo
-npm test              # Full test suite
-npm run test:coverage # Coverage with thresholds
-npm run lint          # ESLint
-npm run format        # Prettier
+npm test                   # full suite
+npm run test:coverage      # coverage + thresholds
+npm run typecheck          # TypeScript across all workspaces
+npm run lint               # ESLint
+npm run format:check       # Prettier
 ```
 
-## Funding testnet wallets
+---
 
-1. Generate a Stellar keypair at [laboratory.stellar.org](https://laboratory.stellar.org)
-2. Fund with [Friendbot](https://friendbot.stellar.org)
-3. Add USDC testnet trustline
-4. Fund USDC from [Circle testnet faucet](https://faucet.circle.com)
+## 💳 Testnet Wallet Setup
+
+```
+1. Generate keypair   →  https://laboratory.stellar.org
+2. Fund with XLM      →  https://friendbot.stellar.org
+3. Add USDC trustline →  via Stellar Laboratory
+4. Fund USDC          →  https://faucet.circle.com
+```
+
+---
+
+## 🏗 Stack
+
+```
+Language      TypeScript 5
+API           Express 5
+Payments      x402, @x402/stellar, @x402/express
+Network       Stellar testnet (Soroban RPC)
+Storage       SQLite (better-sqlite3), memory adapter
+Frontend      React 18, Vite, Tailwind CSS
+Schemas       Zod
+Monorepo      npm workspaces
+```
+
+---
 
 ## License
 
