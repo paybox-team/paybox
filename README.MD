@@ -4,7 +4,7 @@
 
 
 <div align="center">
-  <img src="./public/PayBox-logo.png" alt="PayBox logo" width="180" />
+  <img src="./apps/web/public/assets/paybox-logo.svg" alt="PayBox logo" width="180" />
   <h1>PayBox</h1>
   <p><strong>Agentic pay-per-query internet access on Stellar with x402.</strong></p>
 
