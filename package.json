@@ -1,0 +1,45 @@
+{
+  "name": "paybox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PayBox monorepo: agentic pay-per-query hub with Stellar x402",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0 <25.0.0"
+  },
+  "scripts": {
+    "dev:api": "npm run dev --workspace @paybox/api",
+    "dev:web": "npm run dev --workspace @paybox/web",
+    "dev:agent": "npm run dev --workspace @paybox/agent-client",
+    "start:api": "npm run start --workspace @paybox/api",
+    "cli": "npm run cli --workspace @paybox/agent-client --",
+    "demo:agent": "npm run demo --workspace @paybox/agent-client",
+    "validate:real": "npm run validate:real --workspace @paybox/agent-client",
+    "preview:web": "npm run preview --workspace @paybox/web",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test --workspace @paybox/shared && npm run test --workspace @paybox/api && npm run test --workspace @paybox/agent-client && npm run test --workspace @paybox/web",
+    "test:coverage": "npm run test:coverage --workspace @paybox/api",
+    "migrate:analytics": "npm run migrate:analytics --workspace @paybox/api",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:source-artifacts": "node scripts/check-source-artifacts.mjs",
+    "check:payment-leaks": "node scripts/check-payment-leaks.mjs",
+    "clean": "node scripts/clean.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.62.1"
+  },
+  "dependencies": {
+    "yallist": "3.1.1"
+  }
+}
